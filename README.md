@@ -33,9 +33,9 @@ cache.ready.then(function(list){
 }) 
 ```
 
-* **mode: "mirror"**: Mirrors the file structure at `serverRoot` at `localRoot`.
+* **mode: "mirror"**: Mirrors the file structure from `serverRoot` at `localRoot`.
 * **mode: "hash"**: Filename is hash of server url (plus extension).
-* See FileSystem options at [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise-fs)
+* **CordovaPromiseFS()** is an instance of [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise-fs).
 
 ### Add files to the cache
 ```javascript
@@ -45,16 +45,16 @@ cache.add('http://yourserver.com/folder/photo1.jpg')
 cache.add('folder/photo2.jpg')  // automatically prepends the `severRoot`
 cache.add(['photo3.jpg','photo4.jpg'])
 
-
-// After adding new files the cache is `dirty` - it needs to download.
-cache.isDirty() // = true
-// cache.add also returns if the cache is dirty. Could be false when adding existing files.
+// Now the cache is dirty: It needs to download.
+cache.isDirty() === true
+// cache.add also returns if the cache is dirty.
 var dirty = cache.add(['photo3.jpg']) 
 
-// Download files. It is recommended to avoid heavy UI and animation while downloading.
-cache.download(onprogress).then(function(cache){ ...},function(failedDownloads) { ... }) 
-
-// The optional 'onprogress' event handler is enhanced with information about the total download queue:
+// Download files. 
+cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
+// It is recommended to avoid heavy UI and animation while downloading.
+// The optional 'onprogress' event handler is enhanced with information
+// about the total download queue:
 onprogress = function(ProgressEvent) {
   ProgressEvent.index // current download index
   ProgressEvent.total // total files to download
@@ -63,16 +63,18 @@ onprogress = function(ProgressEvent) {
 
 ### Use the cache
 ```javascript
-// Get the cached version of the file:
-cache.get('photo3.jpg');           // = toInternalURL = "cdvfile://localhost/persisent/cache/photo3.jpg"
-cache.toInternalURL('photo3.jpg'); //                 = "cdvfile://localhost/persisent/cache/photo3.jpg"
-cache.toInternalURL('http://yourserver.com/photo3.jpg'); // You can prepend the serverRoot if it pleases you.
-cache.toURL('photo3.jpg');         // = "file://.../photo3.jpg";
+// Get the cached internalURL of the file: "cdvfile://localhost/persisent/cache/photo3.jpg" 
+cache.get('photo3.jpg');           
+cache.toInternalURL('photo3.jpg'); 
+cache.toInternalURL('http://yourserver.com/photo3.jpg'); 
+
+// Get the file URL of the file: "file://.../photo3.jpg";
+cache.toURL('photo3.jpg');
 
 // When file is not cached, the original input is returned as a fallback.
-cache.get('http://yoursever.com/never-cached-this.jpg') // = 'http://yoursever.com/never-cached-this.jpg'
+cache.get('http://yoursever.com/never-cached-this.jpg') === 'http://yoursever.com/never-cached-this.jpg'
 
-// You can also fetch the data as a Base64 encoded string.
+// Get Base64 encoded data URL.
 cache.toDataURL('photo3.jpg').then(function(base64){},function(err){});
 ```
 
@@ -85,7 +87,7 @@ cache.abort()
 cache.clear().then( ... )
 
 // Or remove a single file
-cache.remove('photo3.jpg')
+cache.remove('photo3.jpg').then( ... )
 
 // Returns path on Cordova Filesystem, i.e. "/cache/photo3.jpg"
 cache.toPath('photo3.jpg');      
