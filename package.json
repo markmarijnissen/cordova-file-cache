@@ -4,7 +4,12 @@
   "description": "Cordova File Cache",
   "main": "index.js",
   "scripts": {
+    "prepublish":"gluejs --include index.js --include murmerhash.js --global CordovaFileCache > CordovaFileCache.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:markmarijnissen/cordova-file-cache.git"
   },
   "keywords": [
     "cordova",

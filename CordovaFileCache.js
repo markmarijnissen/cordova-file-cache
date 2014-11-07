@@ -1,3 +1,7 @@
+(function(){
+var r=function(){var e="function"==typeof require&&require,r=function(i,o,u){o||(o=0);var n=r.resolve(i,o),t=r.m[o][n];if(!t&&e){if(t=e(n))return t}else if(t&&t.c&&(o=t.c,n=t.m,t=r.m[o][t.m],!t))throw new Error('failed to require "'+n+'" from '+o);if(!t)throw new Error('failed to require "'+i+'" from '+u);return t.exports||(t.exports={},t.call(t.exports,t,t.exports,r.relative(n,o))),t.exports};return r.resolve=function(e,n){var i=e,t=e+".js",o=e+"/index.js";return r.m[n][t]&&t?t:r.m[n][o]&&o?o:i},r.relative=function(e,t){return function(n){if("."!=n.charAt(0))return r(n,t,e);var o=e.split("/"),f=n.split("/");o.pop();for(var i=0;i<f.length;i++){var u=f[i];".."==u?o.pop():"."!=u&&o.push(u)}return r(o.join("/"),t,e)}},r}();r.m = [];
+r.m[0] = {
+"index.js": function(module, exports, require){
 var hash = require('./murmerhash');
 var Promise = null;
 
@@ -62,19 +66,17 @@ FileCache.prototype.add = function add(urls){
   return self.isDirty();
 };
 
-FileCache.prototype.remove = function remove(urls,returnPromises){
-  var promises = [];
+FileCache.prototype.remove = function remove(urls){
   if(typeof urls === 'string') urls = [urls];
   var self = this;
   urls.forEach(function(url){
     var index = self._added.indexOf(self.toServerURL(url));
     if(index >= 0) self._added.splice(index,1);
     var path = self.toPath(url);
-    promises.push(self._fs.remove(path));
-    console.log('deleting',path);
+    self._fs.remove(path);
     delete self._cached[path];
   });
-  return returnPromises? Promise.all(promises): self.isDirty();
+  return self.isDirty();
 };
 
 FileCache.prototype.getDownloadQueue = function(){
@@ -106,7 +108,7 @@ FileCache.prototype.download = function download(onprogress){
       return self.list();
     }).then(function(){
       // no dowloads needed, resolve
-      if(!self.isDirty()) {
+      if(!self.isDirty) {
         resolve(self);
         return;
       }
@@ -120,7 +122,7 @@ FileCache.prototype.download = function download(onprogress){
       var onSingleDownloadProgress;
       if(typeof onprogress === 'function') {
         onSingleDownloadProgress = function(ev){
-          ev.index = index;
+          ev.index = this.index;
           ev.total = total;
           onprogress(ev);
         };
@@ -150,7 +152,7 @@ FileCache.prototype.download = function download(onprogress){
       // download every file in the queue (which is the diff from _added with _cached)
       queue.forEach(function(url,index){
         console.log('download',url,self.toPath(url));
-        var download = fs.download(url,self.toPath(url),onSingleDownloadProgress);
+        var download = fs.download(url,self.toPath(url),onSingleDownloadProgress.bind({index:index}));
         download.then(onDone,onDone);
         self._downloading.push(download);
       });
@@ -180,8 +182,7 @@ FileCache.prototype.clear = function clear(){
  */
 FileCache.prototype.toInternalURL = function toInternalURL(url){
   path = this.toPath(url);
-  if(this._cached[path]) return this._cached[path].toInternalURL;
-  return 'cdvfile://localhost/'+(this._fs.options.persistent?'persistent':'temporary')+path;
+  return this._cached[path]? this._cached[path].toInternalURL: url;
 };
 
 FileCache.prototype.get = FileCache.prototype.toInternalURL;
@@ -204,7 +205,6 @@ FileCache.prototype.toServerURL = function toServerURL(path){
  */
 FileCache.prototype.toPath = function toPath(url){
   if(this._mirrorMode) {
-    url = url || '';
     len = this._serverRoot.length;
     if(url.substr(0,len) !== this._serverRoot) {
       if(url[0] === '/') url = url.substr(1);
@@ -222,3 +222,74 @@ FileCache.prototype.toPath = function toPath(url){
 };
 
 module.exports = FileCache;
+},
+"murmerhash.js": function(module, exports, require){
+/**
+ * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
+ * 
+ * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
+ * @see http://github.com/garycourt/murmurhash-js
+ * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
+ * @see http://sites.google.com/site/murmurhash/
+ * 
+ * @param {string} key ASCII only
+ * @param {number} seed Positive integer only
+ * @return {number} 32-bit positive integer hash 
+ */
+
+function murmurhash3_32_gc(key, seed) {
+  var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
+  
+  remainder = key.length & 3; // key.length % 4
+  bytes = key.length - remainder;
+  h1 = seed;
+  c1 = 0xcc9e2d51;
+  c2 = 0x1b873593;
+  i = 0;
+  
+  while (i < bytes) {
+      k1 = 
+        ((key.charCodeAt(i) & 0xff)) |
+        ((key.charCodeAt(++i) & 0xff) << 8) |
+        ((key.charCodeAt(++i) & 0xff) << 16) |
+        ((key.charCodeAt(++i) & 0xff) << 24);
+    ++i;
+    
+    k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+    k1 = (k1 << 15) | (k1 >>> 17);
+    k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+
+    h1 ^= k1;
+        h1 = (h1 << 13) | (h1 >>> 19);
+    h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+    h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+  }
+  
+  k1 = 0;
+  
+  switch (remainder) {
+    case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+    case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+    case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+    
+    k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+    k1 = (k1 << 15) | (k1 >>> 17);
+    k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+    h1 ^= k1;
+  }
+  
+  h1 ^= key.length;
+
+  h1 ^= h1 >>> 16;
+  h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+  h1 ^= h1 >>> 13;
+  h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+  h1 ^= h1 >>> 16;
+
+  return h1 >>> 0;
+}
+
+module.exports = murmurhash3_32_gc;
+}
+};
+CordovaFileCache = r("index.js");}());

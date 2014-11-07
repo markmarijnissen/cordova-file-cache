@@ -6,9 +6,13 @@ cordova-file-cache
 ## Getting started
 
 ```bash
-  # fetch code using bower or npm
+  # fetch code using bower
   bower install cordova-file-cache cordova-promise-fs
+  # ...or npm...
   npm install cordova-file-cache cordova-promise-fs
+  # or just download and include the javascript
+  curl https://raw.githubusercontent.com/markmarijnissen/cordova-promise-fs/master/CordovaPromiseFS.js
+  curl https://raw.githubusercontent.com/markmarijnissen/cordova-file-cache/master/CordovaFileCache.js
 
   # install Cordova plugins
   cordova plugin add org.apache.cordova.file
@@ -111,6 +115,12 @@ cache.list().then(function(list){...},function(err){...})
 ### 0.1.0 (06/11/2014)
 
 ## Contribute
+
+Convert CommonJS to a browser-version:
+```bash
+npm install gluejs -g
+npm run-script prepublish
+```
 
 Feel free to contribute to this project in any way. The easiest way to support this project is by giving it a star.
 
