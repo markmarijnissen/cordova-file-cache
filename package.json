@@ -1,10 +1,10 @@
 {
   "name": "cordova-file-cache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cordova File Cache",
   "main": "index.js",
   "scripts": {
-    "prepublish":"gluejs --include index.js --include murmerhash.js --global CordovaFileCache > CordovaFileCache.js",
+    "prepublish": "gluejs --include index.js --include murmerhash.js --global CordovaFileCache > CordovaFileCache.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +19,6 @@
   "author": "Mark Marijnissen",
   "license": "MIT",
   "dependencies": {
-    "cordova-promise-fs": "^0.3.0"
+    "cordova-promise-fs": "^0.4.1"
   }
 }

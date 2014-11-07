@@ -66,17 +66,19 @@ FileCache.prototype.add = function add(urls){
   return self.isDirty();
 };
 
-FileCache.prototype.remove = function remove(urls){
+FileCache.prototype.remove = function remove(urls,returnPromises){
+  var promises = [];
   if(typeof urls === 'string') urls = [urls];
   var self = this;
   urls.forEach(function(url){
     var index = self._added.indexOf(self.toServerURL(url));
     if(index >= 0) self._added.splice(index,1);
     var path = self.toPath(url);
-    self._fs.remove(path);
+    promises.push(self._fs.remove(path));
+    console.log('deleting',path);
     delete self._cached[path];
   });
-  return self.isDirty();
+  return returnPromises? Promise.all(promises): self.isDirty();
 };
 
 FileCache.prototype.getDownloadQueue = function(){
@@ -108,7 +110,7 @@ FileCache.prototype.download = function download(onprogress){
       return self.list();
     }).then(function(){
       // no dowloads needed, resolve
-      if(!self.isDirty) {
+      if(!self.isDirty()) {
         resolve(self);
         return;
       }
@@ -122,7 +124,7 @@ FileCache.prototype.download = function download(onprogress){
       var onSingleDownloadProgress;
       if(typeof onprogress === 'function') {
         onSingleDownloadProgress = function(ev){
-          ev.index = this.index;
+          ev.index = index;
           ev.total = total;
           onprogress(ev);
         };
@@ -152,7 +154,7 @@ FileCache.prototype.download = function download(onprogress){
       // download every file in the queue (which is the diff from _added with _cached)
       queue.forEach(function(url,index){
         console.log('download',url,self.toPath(url));
-        var download = fs.download(url,self.toPath(url),onSingleDownloadProgress.bind({index:index}));
+        var download = fs.download(url,self.toPath(url),onSingleDownloadProgress);
         download.then(onDone,onDone);
         self._downloading.push(download);
       });
@@ -182,7 +184,8 @@ FileCache.prototype.clear = function clear(){
  */
 FileCache.prototype.toInternalURL = function toInternalURL(url){
   path = this.toPath(url);
-  return this._cached[path]? this._cached[path].toInternalURL: url;
+  if(this._cached[path]) return this._cached[path].toInternalURL;
+  return 'cdvfile://localhost/'+(this._fs.options.persistent?'persistent':'temporary')+path;
 };
 
 FileCache.prototype.get = FileCache.prototype.toInternalURL;
@@ -205,6 +208,7 @@ FileCache.prototype.toServerURL = function toServerURL(path){
  */
 FileCache.prototype.toPath = function toPath(url){
   if(this._mirrorMode) {
+    url = url || '';
     len = this._serverRoot.length;
     if(url.substr(0,len) !== this._serverRoot) {
       if(url[0] === '/') url = url.substr(1);
