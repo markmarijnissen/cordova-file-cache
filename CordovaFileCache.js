@@ -51,7 +51,9 @@ FileCache.prototype.list = function list(){
         return entry.fullPath;
       });
       resolve(entries);
-    },reject);
+    },function(){
+      resolve([]);
+    });
   });
 };
 
@@ -59,8 +61,9 @@ FileCache.prototype.add = function add(urls){
   if(typeof urls === 'string') urls = [urls];
   var self = this;
   urls.forEach(function(url){
+    url = self.toServerURL(url);
     if(self._added.indexOf(url) === -1) {
-      self._added.push(self.toServerURL(url));
+      self._added.push(url);
     }
   });
   return self.isDirty();
