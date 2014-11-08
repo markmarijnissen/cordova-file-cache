@@ -2,6 +2,7 @@ cordova-file-cache
 ==========
 > Super Awesome File Cache for Cordova Apps
 
+Based on [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise-fs).
 
 ## Getting started
 
