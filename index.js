@@ -1,6 +1,7 @@
 var hash = require('./murmerhash');
 var Promise = null;
 
+/* Cordova File Cache x */
 function FileCache(options){
   // cordova-promise-fs
   this._fs = options.fs;
@@ -13,13 +14,16 @@ function FileCache(options){
   // 'mirror' mirrors files structure from "serverRoot" to "localRoot"
   // 'hash' creates a 1-deep filestructure, where the filenames are hashed server urls (with extension)
   this._mirrorMode = options.mode !== 'hash';
+  this._retry = options.retry || [500,1500,8000];
 
   // normalize path
   this._localRoot = options.localRoot || 'data';
-  this._serverRoot = options.serverRoot || '';
   if(this._localRoot[this._localRoot.length -1] !== '/') this._localRoot += '/';
   if(this._localRoot[0] !== '/') this._localRoot = '/' + this._localRoot;
-  if(this._serverRoot && this._serverRoot[this._serverRoot.length -1] !== '/') this._serverRoot += '/';
+
+  this._serverRoot = options.serverRoot || '';
+  if(!!this._serverRoot && this._serverRoot[this._serverRoot.length-1] !== '/') this._serverRoot += '/';
+  if(this._serverRoot === './') this._serverRoot = '';
 
   // set internal variables
   this._downloading = [];    // download promises
@@ -74,7 +78,6 @@ FileCache.prototype.remove = function remove(urls,returnPromises){
     if(index >= 0) self._added.splice(index,1);
     var path = self.toPath(url);
     promises.push(self._fs.remove(path));
-    console.log('deleting',path);
     delete self._cached[path];
   });
   return returnPromises? Promise.all(promises): self.isDirty();
@@ -113,7 +116,7 @@ FileCache.prototype.download = function download(onprogress){
         resolve(self);
         return;
       }
-      
+
       // keep track of number of downloads!
       var queue = self.getDownloadQueue();
       var index = self._downloading.length;
@@ -132,7 +135,6 @@ FileCache.prototype.download = function download(onprogress){
       // callback
       var onDone = function(){
         index++;
-        console.log('done',index,total);
         // when we're done
         if(index !== total) {
           // reset downloads
@@ -152,8 +154,7 @@ FileCache.prototype.download = function download(onprogress){
 
       // download every file in the queue (which is the diff from _added with _cached)
       queue.forEach(function(url,index){
-        console.log('download',url,self.toPath(url));
-        var download = fs.download(url,self.toPath(url),onSingleDownloadProgress);
+        var download = fs.download(url,self.toPath(url),{retry:self._retry},onSingleDownloadProgress);
         download.then(onDone,onDone);
         self._downloading.push(download);
       });
@@ -199,7 +200,7 @@ FileCache.prototype.toURL = function toInternalURL(url){
 };
 
 FileCache.prototype.toServerURL = function toServerURL(path){
-  return path.substr(0,4) !== 'http'? this._serverRoot + path: path;
+  return path.indexOf('://') < 0? this._serverRoot + path: path;
 };
 
 /**
@@ -216,11 +217,7 @@ FileCache.prototype.toPath = function toPath(url){
       return this._localRoot + url.substr(len);
     }
   } else {
-    if(url.substr(0,4) !== 'http') {
-      throw new Error('Invalid url. Must start with "http".');
-    } else {
-      return this._localRoot + hash(url) + url.substr(url.lastIndexOf('.'));
-    }
+    return this._localRoot + hash(url) + url.substr(url.lastIndexOf('.'));
   }
 };
 
