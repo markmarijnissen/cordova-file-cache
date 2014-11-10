@@ -32,6 +32,7 @@ var cache = CordovaFileCache({
   mode: 'hash', // or 'mirror'
   localRoot: 'data',
   serverRoot: 'http://yourserver.com/files/' // optional, required on 'mirror' mode
+  cacheBuster: false 
 });
 
 cache.ready.then(function(list){
@@ -43,6 +44,7 @@ cache.ready.then(function(list){
 * **mode: "mirror"**: Mirrors the file structure from `serverRoot` at `localRoot`.
 * **mode: "hash"**: Filename is hash of server url (plus extension).
 * **CordovaPromiseFS()** is an instance of [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise-fs).
+* `cacheBuster` appends a timestamp to the url `?xxxxxx` to avoid the network cache.
 
 ### Add files to the cache
 ```javascript
@@ -114,6 +116,10 @@ cache.list().then(function(list){...},function(err){...})
 ```
 
 ## Changelog
+
+### 0.3.0 (09/11/2014)
+
+* Added `cacheBuster` option.
 
 ### 0.2.0 (07/11/2014)
 

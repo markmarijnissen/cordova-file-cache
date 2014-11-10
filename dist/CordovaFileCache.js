@@ -62,6 +62,7 @@ var CordovaFileCache =
 	  // 'hash' creates a 1-deep filestructure, where the filenames are hashed server urls (with extension)
 	  this._mirrorMode = options.mode !== 'hash';
 	  this._retry = options.retry || [500,1500,8000];
+	  this._cacheBuster = !!options.cacheBuster;
 
 	  // normalize path
 	  this._localRoot = options.localRoot || 'data';
@@ -209,7 +210,8 @@ var CordovaFileCache =
 	            },reject);
 	          }
 	        };
-
+	        var downloadUrl = url;
+	        if(self._cacheBuster) downloadUrl += "?"+Date.now();
 	        var download = fs.download(url,path,{retry:self._retry},onSingleDownloadProgress);
 	        download.then(onDone,onDone);
 	        self._downloading.push(download);
