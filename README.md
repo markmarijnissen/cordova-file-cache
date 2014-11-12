@@ -117,6 +117,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.4.0 (13/11/2014)
+
+* Added Chrome Support!
+
 ### 0.3.0 (09/11/2014)
 
 * Added `cacheBuster` option.
