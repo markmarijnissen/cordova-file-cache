@@ -64,6 +64,7 @@ FileCache.prototype.list = function list(){
 };
 
 FileCache.prototype.add = function add(urls){
+  if(!urls) urls = [];
   if(typeof urls === 'string') urls = [urls];
   var self = this;
   urls.forEach(function(url){
@@ -76,6 +77,7 @@ FileCache.prototype.add = function add(urls){
 };
 
 FileCache.prototype.remove = function remove(urls,returnPromises){
+  if(!urls) urls = [];
   var promises = [];
   if(typeof urls === 'string') urls = [urls];
   var self = this;
