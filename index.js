@@ -1,7 +1,6 @@
 var hash = require('./murmerhash');
 var Promise = null;
 var isCordova = typeof cordova !== 'undefined';
-var SERVER_DETECT = isCordova? '://':'filesystem:';
 
 if(!isCordova) {
   window.ProgressEvent = function ProgressEvent(){}
@@ -224,7 +223,7 @@ FileCache.prototype.toURL = function toInternalURL(url){
 
 FileCache.prototype.toServerURL = function toServerURL(path){
   if(path[0] === '/') path = path.substr(1);
-  return path.indexOf(SERVER_DETECT) < 0? this._serverRoot + path: path;
+  return path.indexOf('://') < 0? this._serverRoot + path: path;
 };
 
 /**
