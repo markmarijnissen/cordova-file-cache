@@ -80,8 +80,9 @@ cache.toInternalURL('http://yourserver.com/photo3.jpg');
 // Get the file URL of the file: "file://.../photo3.jpg";
 cache.toURL('photo3.jpg');
 
-// When file is not cached, the original input is returned as a fallback.
+// When file is not cached, the server URL is returned as a fallback.
 cache.get('http://yoursever.com/never-cached-this.jpg') === 'http://yoursever.com/never-cached-this.jpg'
+cache.get('never-cached-this.jpg') === 'http://yoursever.com/never-cached-this.jpg'
 
 // Get Base64 encoded data URL.
 cache.toDataURL('photo3.jpg').then(function(base64){},function(err){});
@@ -116,6 +117,10 @@ cache.list().then(function(list){...},function(err){...})
 ```
 
 ## Changelog
+
+### 0.5.0 (15/11/2014)
+
+* Bugfix: Make sure cache returns a valid server URL if file is not cached.
 
 ### 0.4.0 (13/11/2014)
 
