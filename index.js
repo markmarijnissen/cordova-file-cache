@@ -209,10 +209,14 @@ FileCache.prototype.clear = function clear(){
 FileCache.prototype.toInternalURL = function toInternalURL(url){
   path = this.toPath(url);
   if(this._cached[path]) return this._cached[path].toInternalURL;
-  return this.toServerURL(path);
+  return this._fs.toInternalURLSync(path);
 };
 
-FileCache.prototype.get = FileCache.prototype.toInternalURL;
+FileCache.prototype.get = function get(url){
+  path = this.toPath(url);
+  if(this._cached[path]) return this._cached[path].toInternalURL;
+  return this.toServerURL(url);
+};
 
 FileCache.prototype.toDataURL = function toDataURL(url){
   return this._fs.toDataURL(this.toPath(url));
@@ -220,7 +224,7 @@ FileCache.prototype.toDataURL = function toDataURL(url){
 
 FileCache.prototype.toURL = function toURL(url){
   path = this.toPath(url);
-  return this._cached[path]? this._cached[path].toURL: this.toServerURL(url);
+  return this._cached[path]? this._cached[path].toURL: url;
 };
 
 FileCache.prototype.toServerURL = function toServerURL(path){

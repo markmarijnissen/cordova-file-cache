@@ -256,7 +256,7 @@ var CordovaFileCache =
 	FileCache.prototype.toInternalURL = function toInternalURL(url){
 	  path = this.toPath(url);
 	  if(this._cached[path]) return this._cached[path].toInternalURL;
-	  return this._fs.toInternalURLSync(path);
+	  return this.toServerURL(path);
 	};
 
 	FileCache.prototype.get = FileCache.prototype.toInternalURL;
