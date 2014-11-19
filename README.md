@@ -118,6 +118,11 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.6.0 (19/11/2014)
+
+* Bugfix: changes to "get" and "toInternalURL" methods.
+* Bugfix: LocalRoot should NOT start with a slash (Android)
+
 ### 0.5.0 (15/11/2014)
 
 * Bugfix: Make sure cache returns a valid server URL if file is not cached.
