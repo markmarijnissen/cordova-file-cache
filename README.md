@@ -118,6 +118,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.7.0 (27/11/2014)
+
+* Added tests and fixed few minor bugs
+
 ### 0.6.0 (19/11/2014)
 
 * Bugfix: changes to "get" and "toInternalURL" methods.
