@@ -49,10 +49,6 @@ var CordovaFileCache =
 	var Promise = null;
 	var isCordova = typeof cordova !== 'undefined';
 
-	if(!isCordova) {
-	  window.ProgressEvent = function ProgressEvent(){}
-	}
-
 	function removeFirstSlash(path){
 	  if(path[0] === '/') path = path.substr(1);
 	  return path;
@@ -60,6 +56,7 @@ var CordovaFileCache =
 
 	/* Cordova File Cache x */
 	function FileCache(options){
+	  var self = this;
 	  // cordova-promise-fs
 	  this._fs = options.fs;
 	  if(!this._fs) {
@@ -88,7 +85,9 @@ var CordovaFileCache =
 	  this._cached = {};         // cached files
 
 	  // list existing cache contents
-	  this.ready = this.list();
+	  this.ready = this._fs.ensure(this._localRoot).then(function(){
+	    return self.list();
+	  });
 	}
 
 	/**
@@ -251,8 +250,11 @@ var CordovaFileCache =
 	};
 
 	FileCache.prototype.clear = function clear(){
+	  var self = this;
 	  this._cached = {};
-	  return this._fs.removeDir(this._localRoot);
+	  return this._fs.removeDir(this._localRoot).then(function(){
+	    return self._fs.ensure(self._localRoot);
+	  });
 	};
 
 	/**
@@ -261,7 +263,7 @@ var CordovaFileCache =
 	FileCache.prototype.toInternalURL = function toInternalURL(url){
 	  path = this.toPath(url);
 	  if(this._cached[path]) return this._cached[path].toInternalURL;
-	  return this._fs.toInternalURLSync(path);
+	  return url;
 	};
 
 	FileCache.prototype.get = function get(url){
@@ -293,8 +295,10 @@ var CordovaFileCache =
 	    len = this._serverRoot.length;
 	    if(url.substr(0,len) !== this._serverRoot) {
 	      url = removeFirstSlash(url);
+	      console.log('toPath',this._localRoot + url);
 	      return this._localRoot + url;
 	    } else {
+	      console.log('toPath',this._localRoot + url.substr(len));
 	      return this._localRoot + url.substr(len);
 	    }
 	  } else {
