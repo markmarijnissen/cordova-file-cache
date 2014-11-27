@@ -248,10 +248,8 @@ FileCache.prototype.toPath = function toPath(url){
     len = this._serverRoot.length;
     if(url.substr(0,len) !== this._serverRoot) {
       url = removeFirstSlash(url);
-      console.log('toPath',this._localRoot + url);
       return this._localRoot + url;
     } else {
-      console.log('toPath',this._localRoot + url.substr(len));
       return this._localRoot + url.substr(len);
     }
   } else {
