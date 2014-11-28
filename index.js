@@ -2,11 +2,6 @@ var hash = require('./murmerhash');
 var Promise = null;
 var isCordova = typeof cordova !== 'undefined';
 
-function removeFirstSlash(path){
-  if(path[0] === '/') path = path.substr(1);
-  return path;
-}
-
 /* Cordova File Cache x */
 function FileCache(options){
   var self = this;
@@ -25,12 +20,8 @@ function FileCache(options){
   this._cacheBuster = !!options.cacheBuster;
 
   // normalize path
-  this._localRoot = removeFirstSlash(options.localRoot || 'data');
-  if(this._localRoot[this._localRoot.length -1] !== '/') this._localRoot += '/';
-
-  this._serverRoot = options.serverRoot || '';
-  if(!!this._serverRoot && this._serverRoot[this._serverRoot.length-1] !== '/') this._serverRoot += '/';
-  if(this._serverRoot === './') this._serverRoot = '';
+  this.localRoot = this._fs.normalize(options.localRoot || 'data');
+  this.serverRoot = this._fs.normalize(options.serverRoot || '');
 
   // set internal variables
   this._downloading = [];    // download promises
@@ -38,7 +29,10 @@ function FileCache(options){
   this._cached = {};         // cached files
 
   // list existing cache contents
-  this.ready = this._fs.ensure(this._localRoot).then(function(){
+  this.ready = this._fs.ensure(this.localRoot)
+  .then(function(entry){
+    self.localInternalURL = isCordova? entry.toInternalURL(): entry.toURL();
+    self.localUrl = entry.toURL();
     return self.list();
   });
 }
@@ -50,15 +44,15 @@ function FileCache(options){
 FileCache.prototype.list = function list(){
   var self = this;
   return new Promise(function(resolve,reject){
-    self._fs.list(self._localRoot,'rfe').then(function(entries){
+    self._fs.list(self.localRoot,'rfe').then(function(entries){
       self._cached = {};
       entries = entries.map(function(entry){
-        var fullPath = removeFirstSlash(entry.fullPath);
+        var fullPath = self._fs.normalize(entry.fullPath);
         self._cached[fullPath] = {
           toInternalURL: isCordova? entry.toInternalURL(): entry.toURL(),
           toURL: entry.toURL(),
         };
-        return entry.fullPath;
+        return fullPath;
       });
       resolve(entries);
     },function(){
@@ -120,7 +114,7 @@ FileCache.prototype.download = function download(onprogress){
     // make sure cache directory exists and that
     // we have retrieved the latest cache contents
     // to avoid downloading files we already have!
-    fs.ensure(self._localRoot).then(function(){
+    fs.ensure(self.localRoot).then(function(){
       return self.list();
     }).then(function(){
       // no dowloads needed, resolve
@@ -205,8 +199,8 @@ FileCache.prototype.isCached = function isCached(url){
 FileCache.prototype.clear = function clear(){
   var self = this;
   this._cached = {};
-  return this._fs.removeDir(this._localRoot).then(function(){
-    return self._fs.ensure(self._localRoot);
+  return this._fs.removeDir(this.localRoot).then(function(){
+    return self._fs.ensure(self.localRoot);
   });
 };
 
@@ -235,8 +229,8 @@ FileCache.prototype.toURL = function toURL(url){
 };
 
 FileCache.prototype.toServerURL = function toServerURL(path){
-  if(path[0] === '/') path = path.substr(1);
-  return path.indexOf('://') < 0? this._serverRoot + path: path;
+  path = this._fs.normalize(path);
+  return path.indexOf('://') < 0? this.serverRoot + path: path;
 };
 
 /**
@@ -244,16 +238,15 @@ FileCache.prototype.toServerURL = function toServerURL(path){
  */
 FileCache.prototype.toPath = function toPath(url){
   if(this._mirrorMode) {
-    url = url || '';
-    len = this._serverRoot.length;
-    if(url.substr(0,len) !== this._serverRoot) {
-      url = removeFirstSlash(url);
-      return this._localRoot + url;
+    url = url = this._fs.normalize(url || '');
+    len = this.serverRoot.length;
+    if(url.substr(0,len) !== this.serverRoot) {
+      return this.localRoot + url;
     } else {
-      return this._localRoot + url.substr(len);
+      return this.localRoot + url.substr(len);
     }
   } else {
-    return this._localRoot + hash(url) + url.substr(url.lastIndexOf('.'));
+    return this.localRoot + hash(url) + url.substr(url.lastIndexOf('.'));
   }
 };
 

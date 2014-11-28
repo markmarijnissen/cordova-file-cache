@@ -118,6 +118,11 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+
+### 0.8.0 (28/11/2014)
+
+* Normalized path everywhere.
+
 ### 0.7.0 (27/11/2014)
 
 * Added tests and fixed few minor bugs
