@@ -118,6 +118,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.10.0 (21/12/2014)
+
+* Update CordovaPromiseFS dependency
+
 ### 0.9.0 (21/12/2014)
 
 * Bugfix with cacheBuster
