@@ -118,6 +118,9 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.9.0 (21/12/2014)
+
+* Bugfix with cacheBuster
 
 ### 0.8.0 (28/11/2014)
 
