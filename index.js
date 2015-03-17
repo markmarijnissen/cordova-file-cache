@@ -238,6 +238,10 @@ FileCache.prototype.toServerURL = function toServerURL(path){
  */
 FileCache.prototype.toPath = function toPath(url){
   if(this._mirrorMode) {
+    var query = url.indexOf('?');
+    if(query > -1){
+      url = url.substr(0,query);
+    }
     url = url = this._fs.normalize(url || '');
     len = this.serverRoot.length;
     if(url.substr(0,len) !== this.serverRoot) {
