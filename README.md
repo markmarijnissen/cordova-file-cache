@@ -28,11 +28,13 @@ Or just download and include [CordovaPromiseFS.js](https://raw.githubusercontent
 ```javascript
 // Initialize a Cache
 var cache = CordovaFileCache({
-  fs: CordovaPromiseFS(),
-  mode: 'hash', // or 'mirror'
-  localRoot: 'data',
+  fs: new CordovaPromiseFS({ // An instance of CordovaPromiseFS is REQUIRED
+      Promise: Promise // <-- your favorite Promise lib (REQUIRED)
+  }), 
+  mode: 'hash', // or 'mirror', optional
+  localRoot: 'data', //optional
   serverRoot: 'http://yourserver.com/files/' // optional, required on 'mirror' mode
-  cacheBuster: false 
+  cacheBuster: false  // optional
 });
 
 cache.ready.then(function(list){
@@ -41,10 +43,13 @@ cache.ready.then(function(list){
 }) 
 ```
 
+* **CordovaPromiseFS** is **REQUIRED**!
+* You need to include a **Promise** library when creating a CordovaPromiseFS. Any library that follows the A+ spec will work. For example: bluebird or promiscuous.
 * **mode: "mirror"**: Mirrors the file structure from `serverRoot` at `localRoot`.
 * **mode: "hash"**: Filename is hash of server url (plus extension).
 * **CordovaPromiseFS()** is an instance of [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise-fs).
 * `cacheBuster` appends a timestamp to the url `?xxxxxx` to avoid the network cache.
+
 
 ### Add files to the cache
 ```javascript
@@ -117,6 +122,11 @@ cache.list().then(function(list){...},function(err){...})
 ```
 
 ## Changelog
+
+### 0.11.0 (17/03/2014)
+
+* Update CordovaPromiseFS dependency.
+* Fix some errors in README
 
 ### 0.10.0 (21/12/2014)
 
