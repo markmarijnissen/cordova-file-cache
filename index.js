@@ -37,6 +37,8 @@ function FileCache(options){
   });
 }
 
+FileCache.hash = hash;
+
 /**
  * Helper to cache all 'internalURL' and 'URL' for quick synchronous access
  * to the cached files.
