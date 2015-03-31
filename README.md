@@ -27,13 +27,13 @@ Or just download and include [CordovaPromiseFS.js](https://raw.githubusercontent
 ### Initialize & configuration
 ```javascript
 // Initialize a Cache
-var cache = CordovaFileCache({
+var cache = new CordovaFileCache({
   fs: new CordovaPromiseFS({ // An instance of CordovaPromiseFS is REQUIRED
       Promise: Promise // <-- your favorite Promise lib (REQUIRED)
   }), 
   mode: 'hash', // or 'mirror', optional
   localRoot: 'data', //optional
-  serverRoot: 'http://yourserver.com/files/' // optional, required on 'mirror' mode
+  serverRoot: 'http://yourserver.com/files/', // optional, required on 'mirror' mode
   cacheBuster: false  // optional
 });
 
