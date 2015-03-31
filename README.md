@@ -69,9 +69,12 @@ cache.download(onprogress).then(function(cache){ ... },function(failedDownloads)
 // It is recommended to avoid heavy UI and animation while downloading.
 // The optional 'onprogress' event handler is enhanced with information
 // about the total download queue:
-onprogress = function(ProgressEvent) {
-  ProgressEvent.index // current download index
-  ProgressEvent.total // total files to download
+var onprogress = function(e) {
+  console.log("Progress: Downloading " 
+  + e.queueIndex  // current download index
+  + " of " 
+  + e.queueSize // total files to download
+  );
 }
 ```
 
