@@ -69,11 +69,10 @@ var dirty = cache.add(['photo3.jpg'])
 // about the total download queue.
 // It is recommended to avoid heavy UI and animation while downloading.
 var onprogress = function(e) {
-  console.log("Progress: Downloading " 
-  + (e.queueIndex + 1)  // current download index + 1
-  + " of " 
-  + e.queueSize // total files to download
-  );
+  var progress ="Progress: " 
+  + e.queueIndex // current download index 
+  + " " 
+  + e.queueSize; // total files to download
 
 // Download files. 
 cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
