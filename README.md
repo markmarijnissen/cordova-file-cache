@@ -64,17 +64,20 @@ cache.isDirty() === true
 // cache.add also returns if the cache is dirty.
 var dirty = cache.add(['photo3.jpg']) 
 
-// Download files. 
-cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
-// It is recommended to avoid heavy UI and animation while downloading.
+// Downloading files. 
 // The optional 'onprogress' event handler is enhanced with information
-// about the total download queue:
+// about the total download queue.
+// It is recommended to avoid heavy UI and animation while downloading.
 var onprogress = function(e) {
   console.log("Progress: Downloading " 
   + e.queueIndex  // current download index
   + " of " 
   + e.queueSize // total files to download
   );
+
+// Download files. 
+cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
+
 }
 ```
 
