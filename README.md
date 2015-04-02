@@ -27,13 +27,13 @@ Or just download and include [CordovaPromiseFS.js](https://raw.githubusercontent
 ### Initialize & configuration
 ```javascript
 // Initialize a Cache
-var cache = CordovaFileCache({
+var cache = new CordovaFileCache({
   fs: new CordovaPromiseFS({ // An instance of CordovaPromiseFS is REQUIRED
       Promise: Promise // <-- your favorite Promise lib (REQUIRED)
   }), 
   mode: 'hash', // or 'mirror', optional
   localRoot: 'data', //optional
-  serverRoot: 'http://yourserver.com/files/' // optional, required on 'mirror' mode
+  serverRoot: 'http://yourserver.com/files/', // optional, required on 'mirror' mode
   cacheBuster: false  // optional
 });
 
@@ -64,14 +64,19 @@ cache.isDirty() === true
 // cache.add also returns if the cache is dirty.
 var dirty = cache.add(['photo3.jpg']) 
 
+// Downloading files. 
+// The optional 'onprogress' event handler is enhanced with information
+// about the total download queue.
+// It is recommended to avoid heavy UI and animation while downloading.
+var onprogress = function(e) {
+  var progress ="Progress: " 
+  + e.queueIndex // current download index 
+  + " " 
+  + e.queueSize; // total files to download
+
 // Download files. 
 cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
-// It is recommended to avoid heavy UI and animation while downloading.
-// The optional 'onprogress' event handler is enhanced with information
-// about the total download queue:
-onprogress = function(ProgressEvent) {
-  ProgressEvent.index // current download index
-  ProgressEvent.total // total files to download
+
 }
 ```
 
