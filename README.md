@@ -128,11 +128,11 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
-### 0.12.0 (18/03/2014)
+### 0.12.0 (18/03/2015)
 
 * Export hash function as CordovaFileCache.hash (needed by App Loader)
 
-### 0.11.0 (17/03/2014)
+### 0.11.0 (17/03/2015)
 
 * Update CordovaPromiseFS dependency.
 * Fix some errors in README
