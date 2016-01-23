@@ -128,6 +128,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 0.13.0 (23/01/2016)
+
+* Fix download onprogress index
+
 ### 0.12.0 (18/03/2014)
 
 * Export hash function as CordovaFileCache.hash (needed by App Loader)

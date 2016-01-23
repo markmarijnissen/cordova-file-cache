@@ -1,6 +1,6 @@
 {
   "name": "cordova-file-cache",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Cordova File Cache",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,6 @@
   "author": "Mark Marijnissen",
   "license": "MIT",
   "dependencies": {
-    "cordova-promise-fs": "^0.12.0"
+    "cordova-promise-fs": "^0.13.0"
   }
 }

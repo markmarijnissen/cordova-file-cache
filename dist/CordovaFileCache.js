@@ -174,29 +174,23 @@ var CordovaFileCache =
 
 	      // keep track of number of downloads!
 	      var queue = self.getDownloadQueue();
-	      var started = [];
-	      var index = self._downloading.length;
 	      var done = self._downloading.length;
 	      var total = self._downloading.length + queue.length;
 
 	      // download every file in the queue (which is the diff from _added with _cached)
 	      queue.forEach(function(url){
 	        var path = self.toPath(url);
-	        // augment progress event with index/total stats
+	        // augment progress event with done/total stats
 	        var onSingleDownloadProgress;
 	        if(typeof onprogress === 'function') {
 	          onSingleDownloadProgress = function(ev){
-	            ev.queueIndex = index;
+	            ev.queueIndex = done;
 	            ev.queueSize = total;
 	            ev.url = url;
 	            ev.path = path;
-	            ev.percentage = index / total;
+	            ev.percentage = done / total;
 	            if(ev.loaded > 0 && ev.total > 0 && index !== total){
 	               ev.percentage += (ev.loaded / ev.total) / total;
-	            }
-	            if(started.indexOf(url) < 0) {
-	              started.push(url);
-	              index++;
 	            }
 	            onprogress(ev);
 	          };
@@ -205,6 +199,7 @@ var CordovaFileCache =
 	        // callback
 	        var onDone = function(){
 	          done++;
+
 	          // when we're done
 	          if(done === total) {
 	            // reset downloads
@@ -307,7 +302,7 @@ var CordovaFileCache =
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
