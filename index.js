@@ -129,6 +129,7 @@ FileCache.prototype.download = function download(onprogress){
       var queue = self.getDownloadQueue();
       var done = self._downloading.length;
       var total = self._downloading.length + queue.length;
+      var percentage = 0;
 
       // download every file in the queue (which is the diff from _added with _cached)
       queue.forEach(function(url){
@@ -145,6 +146,8 @@ FileCache.prototype.download = function download(onprogress){
             if(ev.loaded > 0 && ev.total > 0 && done !== total){
                ev.percentage += (ev.loaded / ev.total) / total;
             }
+            ev.percentage = Math.max(percentage,ev.percentage);
+            percentage = ev.percentage;
             onprogress(ev);
           };
         }
