@@ -128,6 +128,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 1.0.0
+
+* Update to cordova-promise-fs 1.0.0
+
 ### 0.14.0 (07/02/2016)
 
 * Handle REST api calls better (thanks @xontab)

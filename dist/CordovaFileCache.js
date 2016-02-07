@@ -54,7 +54,7 @@ var CordovaFileCache =
 	  var self = this;
 	  // cordova-promise-fs
 	  this._fs = options.fs;
-	  if(!this._fs) {
+	  if(!this._fs) { 
 	    throw new Error('Missing required option "fs". Add an instance of cordova-promise-fs.');
 	  }
 	  // Use Promises from fs.
