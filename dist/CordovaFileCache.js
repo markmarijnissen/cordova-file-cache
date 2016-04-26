@@ -54,7 +54,7 @@ var CordovaFileCache =
 	  var self = this;
 	  // cordova-promise-fs
 	  this._fs = options.fs;
-	  if(!this._fs) { 
+	  if(!this._fs) {
 	    throw new Error('Missing required option "fs". Add an instance of cordova-promise-fs.');
 	  }
 	  // Use Promises from fs.
@@ -290,7 +290,7 @@ var CordovaFileCache =
 	      url = url.substr(0,query);
 	    }
 	    url = url = this._fs.normalize(url || '');
-	    len = this.serverRoot.length;
+	    var len = this.serverRoot.length;
 	    if(url.substr(0,len) !== this.serverRoot) {
 	      return this.localRoot + url;
 	    } else {
