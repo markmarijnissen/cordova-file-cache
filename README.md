@@ -13,9 +13,9 @@ Based on [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise
   npm install cordova-file-cache cordova-promise-fs
   
   # install Cordova and plugins
-  cordova platform add ios@3.7.0
-  cordova plugin add org.apache.cordova.file
-  cordova plugin add org.apache.cordova.file-transfer # optional
+  cordova platform add ios
+  cordova plugin add cordova-plugin-file
+  cordova plugin add cordova-plugin-file-transfer # optional
 ```
 
 **IMPORTANT:** For iOS, use Cordova 3.7.0 or higher (due to a [bug](https://github.com/AppGyver/steroids/issues/534) that affects requestFileSystem).
