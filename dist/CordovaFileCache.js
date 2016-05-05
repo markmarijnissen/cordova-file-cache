@@ -291,8 +291,8 @@ var CordovaFileCache =
 	    if(query > -1){
 	      url = url.substr(0,query);
 	    }
-	    url = url = this._fs.normalize(url || '');
-	    len = this.serverRoot.length;
+	    url = this._fs.normalize(url || '');
+	    var len = this.serverRoot.length;
 	    if(url.substr(0,len) !== this.serverRoot) {
 	      return this.localRoot + url;
 	    } else {
