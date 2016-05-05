@@ -68,6 +68,12 @@ var dirty = cache.add(['photo3.jpg'])
 // The optional 'onprogress' event handler is enhanced with information
 // about the total download queue.
 // It is recommended to avoid heavy UI and animation while downloading.
+//
+// The optional 'includeFileProgress' defaults to "false".
+// When set to "true", you will also receive progress events from individual file tranfers.
+//
+// "false" is recommended as sending many FileTransfer progress events from native to JS can
+// slow down performance.
 var onprogress = function(e) {
   var progress ="Progress: " 
   + e.queueIndex // current download index 
@@ -75,7 +81,7 @@ var onprogress = function(e) {
   + e.queueSize; // total files to download
 
 // Download files. 
-cache.download(onprogress).then(function(cache){ ... },function(failedDownloads) { ... }) 
+cache.download(onprogress,includeFileProgress).then(function(cache){ ... },function(failedDownloads) { ... }) 
 
 }
 ```
@@ -127,6 +133,11 @@ cache.list().then(function(list){...},function(err){...})
 ```
 
 ## Changelog
+
+### 1.1.0
+
+* Update cordova-promise-fs to 1.1.0
+* Default download progress events only updates on download finished (performance boost!)
 
 ### 1.0.0
 

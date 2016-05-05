@@ -107,9 +107,10 @@ FileCache.prototype.isDirty = function isDirty(){
   return this.getDownloadQueue().length > 0;
 };
 
-FileCache.prototype.download = function download(onprogress){
+FileCache.prototype.download = function download(onprogress,includeFileProgressEvents){
   var fs = this._fs;
   var self = this;
+  includeFileProgressEvents = includeFileProgressEvents || false;
   self.abort();
 
   return new Promise(function(resolve,reject){
@@ -155,6 +156,7 @@ FileCache.prototype.download = function download(onprogress){
         // callback
         var onDone = function(){
           done++;
+          onSingleDownloadProgress(new ProgressEvent());
 
           // when we're done
           if(done === total) {
@@ -176,7 +178,7 @@ FileCache.prototype.download = function download(onprogress){
         };
         var downloadUrl = url;
         if(self._cacheBuster) downloadUrl += "?"+Date.now();
-        var download = fs.download(downloadUrl,path,{retry:self._retry},onSingleDownloadProgress);
+        var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents? onSingleDownloadProgress: undefined);
         download.then(onDone,onDone);
         self._downloading.push(download);
       });
@@ -215,7 +217,7 @@ FileCache.prototype.toInternalURL = function toInternalURL(url){
 
 FileCache.prototype.get = function get(url){
   path = this.toPath(url);
-  if(this._cached[path]) return this._cached[path].toInternalURL;
+  if(this._cached[path]) return this._cached[path].toURL;
   return this.toServerURL(url);
 };
 
