@@ -210,13 +210,13 @@ FileCache.prototype.clear = function clear(){
  * Helpers to output to various formats
  */
 FileCache.prototype.toInternalURL = function toInternalURL(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   if(this._cached[path]) return this._cached[path].toInternalURL;
   return url;
 };
 
 FileCache.prototype.get = function get(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   if(this._cached[path]) return this._cached[path].toURL;
   return this.toServerURL(url);
 };
@@ -226,12 +226,12 @@ FileCache.prototype.toDataURL = function toDataURL(url){
 };
 
 FileCache.prototype.toURL = function toURL(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   return this._cached[path]? this._cached[path].toURL: url;
 };
 
 FileCache.prototype.toServerURL = function toServerURL(path){
-  path = this._fs.normalize(path);
+  var path = this._fs.normalize(path);
   return path.indexOf('://') < 0? this.serverRoot + path: path;
 };
 
