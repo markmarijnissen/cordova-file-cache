@@ -1,6 +1,5 @@
 var hash = require('./murmerhash');
 var Promise = null;
-var isCordova = typeof cordova !== 'undefined';
 
 /* Cordova File Cache x */
 function FileCache(options){
@@ -31,7 +30,7 @@ function FileCache(options){
   // list existing cache contents
   this.ready = this._fs.ensure(this.localRoot)
   .then(function(entry){
-    self.localInternalURL = isCordova? entry.toInternalURL(): entry.toURL();
+    self.localInternalURL = entry.toInternalURL? entry.toInternalURL(): entry.toURL();
     self.localUrl = entry.toURL();
     return self.list();
   });
@@ -51,7 +50,7 @@ FileCache.prototype.list = function list(){
       entries = entries.map(function(entry){
         var fullPath = self._fs.normalize(entry.fullPath);
         self._cached[fullPath] = {
-          toInternalURL: isCordova? entry.toInternalURL(): entry.toURL(),
+          toInternalURL: entry.toInternalURL? entry.toInternalURL(): entry.toURL(),
           toURL: entry.toURL(),
         };
         return fullPath;
