@@ -1,6 +1,5 @@
 var hash = require('./murmerhash');
 var Promise = null;
-var isCordova = typeof cordova !== 'undefined';
 
 /* Cordova File Cache x */
 function FileCache(options){
@@ -31,7 +30,7 @@ function FileCache(options){
   // list existing cache contents
   this.ready = this._fs.ensure(this.localRoot)
   .then(function(entry){
-    self.localInternalURL = isCordova? entry.toInternalURL(): entry.toURL();
+    self.localInternalURL = entry.toInternalURL? entry.toInternalURL(): entry.toURL();
     self.localUrl = entry.toURL();
     return self.list();
   });
@@ -51,7 +50,7 @@ FileCache.prototype.list = function list(){
       entries = entries.map(function(entry){
         var fullPath = self._fs.normalize(entry.fullPath);
         self._cached[fullPath] = {
-          toInternalURL: isCordova? entry.toInternalURL(): entry.toURL(),
+          toInternalURL: entry.toInternalURL? entry.toInternalURL(): entry.toURL(),
           toURL: entry.toURL(),
         };
         return fullPath;
@@ -217,13 +216,13 @@ FileCache.prototype.clear = function clear(){
  * Helpers to output to various formats
  */
 FileCache.prototype.toInternalURL = function toInternalURL(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   if(this._cached[path]) return this._cached[path].toInternalURL;
   return url;
 };
 
 FileCache.prototype.get = function get(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   if(this._cached[path]) return this._cached[path].toURL;
   return this.toServerURL(url);
 };
@@ -233,12 +232,12 @@ FileCache.prototype.toDataURL = function toDataURL(url){
 };
 
 FileCache.prototype.toURL = function toURL(url){
-  path = this.toPath(url);
+  var path = this.toPath(url);
   return this._cached[path]? this._cached[path].toURL: url;
 };
 
 FileCache.prototype.toServerURL = function toServerURL(path){
-  path = this._fs.normalize(path);
+  var path = this._fs.normalize(path);
   return path.indexOf('://') < 0? this.serverRoot + path: path;
 };
 
