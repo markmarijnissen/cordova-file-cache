@@ -134,6 +134,10 @@ cache.list().then(function(list){...},function(err){...})
 
 ## Changelog
 
+### 1.2.0
+
+* Return errors when not all files are loaded instead of empty array
+
 ### 1.1.0
 
 * Update cordova-promise-fs to 1.1.0

@@ -131,6 +131,7 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
       var done = self._downloading.length;
       var total = self._downloading.length + queue.length;
       var percentage = 0;
+      var errors = [];
 
       // download every file in the queue (which is the diff from _added with _cached)
       queue.forEach(function(url){
@@ -171,15 +172,21 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
                 resolve(self);
               // Aye, some files got left behind!
               } else {
-                reject(self.getDownloadQueue());
+                reject(errors);
               }
             },reject);
           }
         };
+        var onErr = function(err){
+          if(err && err.target && err.target.error) err = err.target.error;
+          errors.push(err);
+          onDone();
+        };
+
         var downloadUrl = url;
         if(self._cacheBuster) downloadUrl += "?"+Date.now();
         var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents? onSingleDownloadProgress: undefined);
-        download.then(onDone,onDone);
+        download.then(onDone,onErr);
         self._downloading.push(download);
       });
     },reject);
