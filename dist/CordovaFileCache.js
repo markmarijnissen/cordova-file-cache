@@ -47,7 +47,6 @@ var CordovaFileCache =
 
 	var hash = __webpack_require__(1);
 	var Promise = null;
-	var isCordova = typeof cordova !== 'undefined';
 
 	/* Cordova File Cache x */
 	function FileCache(options){
@@ -78,7 +77,7 @@ var CordovaFileCache =
 	  // list existing cache contents
 	  this.ready = this._fs.ensure(this.localRoot)
 	  .then(function(entry){
-	    self.localInternalURL = isCordova? entry.toInternalURL(): entry.toURL();
+	    self.localInternalURL = entry.toInternalURL? entry.toInternalURL(): entry.toURL();
 	    self.localUrl = entry.toURL();
 	    return self.list();
 	  });
@@ -98,7 +97,7 @@ var CordovaFileCache =
 	      entries = entries.map(function(entry){
 	        var fullPath = self._fs.normalize(entry.fullPath);
 	        self._cached[fullPath] = {
-	          toInternalURL: isCordova? entry.toInternalURL(): entry.toURL(),
+	          toInternalURL: entry.toInternalURL? entry.toInternalURL(): entry.toURL(),
 	          toURL: entry.toURL(),
 	        };
 	        return fullPath;
@@ -178,6 +177,7 @@ var CordovaFileCache =
 	      var done = self._downloading.length;
 	      var total = self._downloading.length + queue.length;
 	      var percentage = 0;
+	      var errors = [];
 
 	      // download every file in the queue (which is the diff from _added with _cached)
 	      queue.forEach(function(url){
@@ -218,15 +218,21 @@ var CordovaFileCache =
 	                resolve(self);
 	              // Aye, some files got left behind!
 	              } else {
-	                reject(self.getDownloadQueue());
+	                reject(errors);
 	              }
 	            },reject);
 	          }
 	        };
+	        var onErr = function(err){
+	          if(err && err.target && err.target.error) err = err.target.error;
+	          errors.push(err);
+	          onDone();
+	        };
+
 	        var downloadUrl = url;
 	        if(self._cacheBuster) downloadUrl += "?"+Date.now();
 	        var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents? onSingleDownloadProgress: undefined);
-	        download.then(onDone,onDone);
+	        download.then(onDone,onErr);
 	        self._downloading.push(download);
 	      });
 	    },reject);
@@ -257,13 +263,13 @@ var CordovaFileCache =
 	 * Helpers to output to various formats
 	 */
 	FileCache.prototype.toInternalURL = function toInternalURL(url){
-	  path = this.toPath(url);
+	  var path = this.toPath(url);
 	  if(this._cached[path]) return this._cached[path].toInternalURL;
 	  return url;
 	};
 
 	FileCache.prototype.get = function get(url){
-	  path = this.toPath(url);
+	  var path = this.toPath(url);
 	  if(this._cached[path]) return this._cached[path].toURL;
 	  return this.toServerURL(url);
 	};
@@ -273,12 +279,12 @@ var CordovaFileCache =
 	};
 
 	FileCache.prototype.toURL = function toURL(url){
-	  path = this.toPath(url);
+	  var path = this.toPath(url);
 	  return this._cached[path]? this._cached[path].toURL: url;
 	};
 
 	FileCache.prototype.toServerURL = function toServerURL(path){
-	  path = this._fs.normalize(path);
+	  var path = this._fs.normalize(path);
 	  return path.indexOf('://') < 0? this.serverRoot + path: path;
 	};
 
@@ -308,6 +314,7 @@ var CordovaFileCache =
 	};
 
 	module.exports = FileCache;
+
 
 /***/ },
 /* 1 */
