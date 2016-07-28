@@ -156,7 +156,7 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
         // callback
         var onDone = function(){
           done++;
-          onSingleDownloadProgress(new ProgressEvent());
+          if(onSingleDownloadProgress) onSingleDownloadProgress(new ProgressEvent());
 
           // when we're done
           if(done === total) {

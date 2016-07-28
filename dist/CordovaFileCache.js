@@ -203,7 +203,7 @@ var CordovaFileCache =
 	        // callback
 	        var onDone = function(){
 	          done++;
-	          onSingleDownloadProgress(new ProgressEvent());
+						if(onSingleDownloadProgress) onSingleDownloadProgress(new ProgressEvent());
 
 	          // when we're done
 	          if(done === total) {
