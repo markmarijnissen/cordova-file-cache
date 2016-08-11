@@ -259,8 +259,11 @@ FileCache.prototype.toPath = function toPath(url){
     }
   } else {
     var ext = url.substr(url.lastIndexOf('.'));
-    if ((ext.indexOf("?") > 0) || (ext.indexOf("/") > 0)) {
-      ext = ".txt";
+    if (ext.indexOf('?') > 0) {
+      ext = ext.substr(0, ext.indexOf('?'))
+    }
+    if (ext.indexOf('/') > 0) {
+      ext = ext.substr(0, ext.indexOf('/'))
     }
     return this.localRoot + hash(url) + ext;
   }
