@@ -64,12 +64,14 @@ FileCache.prototype.list = function list(){
 
 FileCache.prototype.add = function add(urls){
   if(!urls) urls = [];
-  if(typeof urls === 'string') urls = [urls];
+  urls = [].concat(urls);
   var self = this;
   urls.forEach(function(url){
     cacheObject = self.toCacheObject(url);
-    if(self._added.indexOf(cacheObject.url) === -1) {
-      self._added.push(cacheObject.url);
+    if (!self._added.reduce(function(hasUrl, co) {
+      return cacheObject.url == co.url ? true : hasUrl;
+    }, false)) {
+      self._added.push(cacheObject);
     }
   });
   return self.isDirty();
@@ -78,12 +80,13 @@ FileCache.prototype.add = function add(urls){
 FileCache.prototype.remove = function remove(urls,returnPromises){
   if(!urls) urls = [];
   var promises = [];
-  if(typeof urls === 'string') urls = [urls];
+  urls = [].concat(urls);
   var self = this;
-  urls.forEach(function(url){
-    var index = self._added.indexOf(self.toServerURL(url));
-    if(index >= 0) self._added.splice(index,1);
-    var path = self.toPath(url);
+  urls.forEach(function(cacheObject){
+    self._added = self._added.filter(function(co) {
+      return url != co.url;
+    });
+    var path = self.toPath(cacheObject);
     promises.push(self._fs.remove(path));
     delete self._cached[path];
   });
@@ -92,8 +95,8 @@ FileCache.prototype.remove = function remove(urls,returnPromises){
 
 FileCache.prototype.getDownloadQueue = function(){
   var self = this;
-  var queue = self._added.filter(function(url){
-    return !self.isCached(url);
+  var queue = self._added.filter(function(cacheObject){
+    return !self.isCached(cacheObject);
   });
   return queue;
 };
@@ -133,15 +136,15 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
       var errors = [];
 
       // download every file in the queue (which is the diff from _added with _cached)
-      queue.forEach(function(url){
-        var path = self.toPath(url);
+      queue.forEach(function(cacheObject){
+        var path = self.toPath(cacheObject);
         // augment progress event with done/total stats
         var onSingleDownloadProgress;
         if(typeof onprogress === 'function') {
           onSingleDownloadProgress = function(ev){
             ev.queueIndex = done;
             ev.queueSize = total;
-            ev.url = url;
+            ev.url = cacheObject.url;
             ev.path = path;
             ev.percentage = done / total;
             if(ev.loaded > 0 && ev.total > 0 && done !== total){
@@ -182,7 +185,7 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
           onDone();
         };
 
-        var downloadUrl = url;
+        var downloadUrl = cacheObject.url;
         if(self._cacheBuster) downloadUrl += "?"+Date.now();
         var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents? onSingleDownloadProgress: undefined);
         download.then(onDone,onErr);
@@ -199,8 +202,8 @@ FileCache.prototype.abort = function abort(){
   this._downloading = [];
 };
 
-FileCache.prototype.isCached = function isCached(url){
-  url = this.toPath(url);
+FileCache.prototype.isCached = function isCached(cacheObject){
+  url = this.toPath(cacheObject);
   return !!this._cached[url];
 };
 
@@ -271,6 +274,10 @@ FileCache.prototype.toCacheObject = function(path){
  */
 FileCache.prototype.toPath = function toPath(cacheObject){
   var url = (typeof cacheObject === 'string') ? cacheObject : cacheObject.url;
+
+  if (typeof cacheObject === 'object' && cacheObject.filename) {
+    return this.localRoot + cacheObject.filename;
+  }
 
   if(this._mirrorMode) {
     var query = url.indexOf('?');
