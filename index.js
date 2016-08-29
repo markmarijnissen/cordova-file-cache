@@ -67,9 +67,9 @@ FileCache.prototype.add = function add(urls){
   if(typeof urls === 'string') urls = [urls];
   var self = this;
   urls.forEach(function(url){
-    url = self.toServerURL(url);
-    if(self._added.indexOf(url) === -1) {
-      self._added.push(url);
+    cacheObject = self.toCacheObject(url);
+    if(self._added.indexOf(cacheObject.url) === -1) {
+      self._added.push(cacheObject.url);
     }
   });
   return self.isDirty();
@@ -236,26 +236,56 @@ FileCache.prototype.toURL = function toURL(url){
   return this._cached[path]? this._cached[path].toURL: url;
 };
 
-FileCache.prototype.toServerURL = function toServerURL(path){
-  var path = this._fs.normalize(path);
+FileCache.prototype.toServerURL = function toServerURL(cacheObject){
+  var path = cacheObject;
+
+  if(typeof cacheObject !== 'string') {
+    if (cacheObject.url) {
+      return cacheObject.url;
+    }
+    path = cacheObject.filename;
+  }
+
+  path = this._fs.normalize(path);
   return path.indexOf('://') < 0? this.serverRoot + path: path;
 };
+
+FileCache.prototype.toCacheObject = function(path){
+  var cacheObject = path;
+
+  if (typeof cacheObject === 'string') {
+    cacheObject = {
+      filename: path
+    }
+  }
+
+  if (!cacheObject.url) {
+    cacheObject.url = this.toServerURL(cacheObject.filename)
+  }
+
+  return cacheObject;
+}
 
 /**
  * Helper to transform remote URL to a local path (for cordova-promise-fs)
  */
-FileCache.prototype.toPath = function toPath(url){
+FileCache.prototype.toPath = function toPath(cacheObject){
+  var url = (typeof cacheObject === 'string') ? cacheObject : cacheObject.url;
+
   if(this._mirrorMode) {
     var query = url.indexOf('?');
     if(query > -1){
       url = url.substr(0,query);
     }
+    var protocol = url.indexOf('://');
     url = this._fs.normalize(url || '');
     var len = this.serverRoot.length;
-    if(url.substr(0,len) !== this.serverRoot) {
+    if(url.substr(0,len) === this.serverRoot) {
+      return this.localRoot + url.substr(len);
+    } else if (protocol === -1) {
       return this.localRoot + url;
     } else {
-      return this.localRoot + url.substr(len);
+      return this.localRoot + url.substr(protocol + 3);
     }
   } else {
     var ext = url.substr(url.lastIndexOf('.'));
