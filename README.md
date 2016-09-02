@@ -132,6 +132,15 @@ cache.list().then(function(list){...},function(err){...})
 
 ```
 
+## Notes
+
+### Status != 200
+
+If you add a file to the cache which does not return a 200 status code, the
+download of that file will take 5-10 seconds to fail. Further, the file will be
+left in the download queue, and so will be downloaded again on each subsequent
+`.download()` run, with a 5-10 second delay each time.
+
 ## Changelog
 
 ### 1.2.0
