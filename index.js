@@ -206,7 +206,9 @@ FileCache.prototype.isCached = function isCached(url){
 
 FileCache.prototype.clear = function clear(){
   var self = this;
-  this._cached = {};
+  self._cached = {};
+  self._added = [];
+  self.abort();
   return this._fs.removeDir(this.localRoot).then(function(){
     return self._fs.ensure(self.localRoot);
   });
