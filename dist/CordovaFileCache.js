@@ -53,7 +53,7 @@ var CordovaFileCache =
 	  var self = this;
 	  // cordova-promise-fs
 	  this._fs = options.fs;
-	  if(!this._fs) { 
+	  if(!this._fs) {
 	    throw new Error('Missing required option "fs". Add an instance of cordova-promise-fs.');
 	  }
 	  // Use Promises from fs.
@@ -77,7 +77,7 @@ var CordovaFileCache =
 	  // list existing cache contents
 	  this.ready = this._fs.ensure(this.localRoot)
 	  .then(function(entry){
-	    self.localInternalURL = entry.toInternalURL? entry.toInternalURL(): entry.toURL();
+	    self.localInternalURL = typeof entry.toInternalURL === 'function'? entry.toInternalURL(): entry.toURL();
 	    self.localUrl = entry.toURL();
 	    return self.list();
 	  });
@@ -97,7 +97,7 @@ var CordovaFileCache =
 	      entries = entries.map(function(entry){
 	        var fullPath = self._fs.normalize(entry.fullPath);
 	        self._cached[fullPath] = {
-	          toInternalURL: entry.toInternalURL? entry.toInternalURL(): entry.toURL(),
+	          toInternalURL: typeof entry.toInternalURL === 'function'? entry.toInternalURL(): entry.toURL(),
 	          toURL: entry.toURL(),
 	        };
 	        return fullPath;
@@ -203,7 +203,7 @@ var CordovaFileCache =
 	        // callback
 	        var onDone = function(){
 	          done++;
-	          onSingleDownloadProgress(new ProgressEvent());
+	          if(onSingleDownloadProgress) onSingleDownloadProgress(new ProgressEvent());
 
 	          // when we're done
 	          if(done === total) {
@@ -231,7 +231,7 @@ var CordovaFileCache =
 
 	        var downloadUrl = url;
 	        if(self._cacheBuster) downloadUrl += "?"+Date.now();
-	        var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents? onSingleDownloadProgress: undefined);
+	        var download = fs.download(downloadUrl,path,{retry:self._retry},includeFileProgressEvents && onSingleDownloadProgress? onSingleDownloadProgress: undefined);
 	        download.then(onDone,onErr);
 	        self._downloading.push(download);
 	      });
@@ -305,9 +305,11 @@ var CordovaFileCache =
 	      return this.localRoot + url.substr(len);
 	    }
 	  } else {
-	    var ext = url.substr(url.lastIndexOf('.'));
-	    if ((ext.indexOf("?") > 0) || (ext.indexOf("/") > 0)) {
-	      ext = ".txt";
+	    var ext = url.match(/\.[a-z]{1,}/g);
+	    if (ext) {
+	      ext = ext[ext.length-1];
+	    } else {
+	      ext = '.txt';
 	    }
 	    return this.localRoot + hash(url) + ext;
 	  }
