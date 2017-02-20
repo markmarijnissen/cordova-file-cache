@@ -166,11 +166,11 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
             self.list().then(function(){
               // final progress event!
               if(onSingleDownloadProgress) onSingleDownloadProgress(new ProgressEvent());
-              // Yes, we're not dirty anymore!
-              if(!self.isDirty()) {
+              // Yes, we're not dirty anymore! (and no errors!)
+              if(!self.isDirty() && !errors) {
                 resolve(self);
-              // Aye, some files got left behind!
               } else {
+                // Aye, some files got left behind! (or at least there were errors...)
                 reject(errors);
               }
             },reject);
