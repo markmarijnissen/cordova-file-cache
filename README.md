@@ -11,7 +11,7 @@ Based on [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise
   bower install cordova-file-cache cordova-promise-fs
   # ...or npm...
   npm install cordova-file-cache cordova-promise-fs
-  
+
   # install Cordova and plugins
   cordova platform add ios
   cordova plugin add cordova-plugin-file
@@ -30,7 +30,7 @@ Or just download and include [CordovaPromiseFS.js](https://raw.githubusercontent
 var cache = new CordovaFileCache({
   fs: new CordovaPromiseFS({ // An instance of CordovaPromiseFS is REQUIRED
       Promise: Promise // <-- your favorite Promise lib (REQUIRED)
-  }), 
+  }),
   mode: 'hash', // or 'mirror', optional
   localRoot: 'data', //optional
   serverRoot: 'http://yourserver.com/files/', // optional, required on 'mirror' mode
@@ -40,7 +40,7 @@ var cache = new CordovaFileCache({
 cache.ready.then(function(list){
     // Promise when cache is ready.
     // Returns a list of paths on the FileSystem that are cached.
-}) 
+})
 ```
 
 * **CordovaPromiseFS** is **REQUIRED**!
@@ -62,9 +62,9 @@ cache.add(['photo3.jpg','photo4.jpg'])
 // Now the cache is dirty: It needs to download.
 cache.isDirty() === true
 // cache.add also returns if the cache is dirty.
-var dirty = cache.add(['photo3.jpg']) 
+var dirty = cache.add(['photo3.jpg'])
 
-// Downloading files. 
+// Downloading files.
 // The optional 'onprogress' event handler is enhanced with information
 // about the total download queue.
 // It is recommended to avoid heavy UI and animation while downloading.
@@ -75,23 +75,23 @@ var dirty = cache.add(['photo3.jpg'])
 // "false" is recommended as sending many FileTransfer progress events from native to JS can
 // slow down performance.
 var onprogress = function(e) {
-  var progress ="Progress: " 
-  + e.queueIndex // current download index 
-  + " " 
+  var progress ="Progress: "
+  + e.queueIndex // current download index
+  + " "
   + e.queueSize; // total files to download
 
-// Download files. 
-cache.download(onprogress,includeFileProgress).then(function(cache){ ... },function(failedDownloads) { ... }) 
+// Download files.
+cache.download(onprogress,includeFileProgress).then(function(cache){ ... },function(failedDownloads) { ... })
 
 }
 ```
 
 ### Use the cache
 ```javascript
-// Get the cached internalURL of the file: "cdvfile://localhost/persisent/cache/photo3.jpg" 
+// Get the cached internalURL of the file: "cdvfile://localhost/persisent/cache/photo3.jpg"
 cache.get('photo3.jpg');           
-cache.toInternalURL('photo3.jpg'); 
-cache.toInternalURL('http://yourserver.com/photo3.jpg'); 
+cache.toInternalURL('photo3.jpg');
+cache.toInternalURL('http://yourserver.com/photo3.jpg');
 
 // Get the file URL of the file: "file://.../photo3.jpg";
 cache.toURL('photo3.jpg');
@@ -119,20 +119,24 @@ cache.remove('photo3.jpg').then( ... )
 cache.toPath('photo3.jpg');      
 
 // Returns server URL to download, i.e. "http://yourserver.com/photo3.jpg";
-cache.toServerURL('photo3.jpg'); 
+cache.toServerURL('photo3.jpg');
 
 // Needs a download?
-cache.isDirty(); 
+cache.isDirty();
 
 // Returns a list of server URLs that need to be downloaded.
 cache.getDownloadQueue();        
 
  // Return a list of paths that are cached (i.e. ["/cache/photo3.jpg"])
-cache.list().then(function(list){...},function(err){...}) 
+cache.list().then(function(list){...},function(err){...})
 
 ```
 
 ## Changelog
+
+### 1.2.2 - bugfixes
+
+* When download is ready, fail if there are no errors instead of fail if cache is dirty (again)
 
 ### 1.2.0
 

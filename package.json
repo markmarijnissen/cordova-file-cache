@@ -1,6 +1,6 @@
 {
   "name": "cordova-file-cache",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Cordova File Cache",
   "main": "index.js",
   "scripts": {

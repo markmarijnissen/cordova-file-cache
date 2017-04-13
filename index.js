@@ -167,7 +167,7 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
               // final progress event!
               if(onSingleDownloadProgress) onSingleDownloadProgress(new ProgressEvent());
               // Yes, we're not dirty anymore!
-              if(!self.isDirty()) {
+              if(errors.length === 0) {
                 resolve(self);
               // Aye, some files got left behind!
               } else {
