@@ -15,7 +15,7 @@ Based on [cordova-promise-fs](https://github.com/markmarijnissen/cordova-promise
   # install Cordova and plugins
   cordova platform add ios
   cordova plugin add cordova-plugin-file
-  cordova plugin add cordova-plugin-file-transfer # optional
+  cordova plugin add cordova-plugin-file-transfer # required to download files
 ```
 
 **IMPORTANT:** For iOS, use Cordova 3.7.0 or higher (due to a [bug](https://github.com/AppGyver/steroids/issues/534) that affects requestFileSystem).
