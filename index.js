@@ -136,7 +136,7 @@ FileCache.prototype.download = function download(onprogress,includeFileProgressE
       queue.forEach(function(url){
         var path = self.toPath(url);
         // augment progress event with done/total stats
-        var onSingleDownloadProgress;
+        var onSingleDownloadProgress = function() {};
         if(typeof onprogress === 'function') {
           onSingleDownloadProgress = function(ev){
             ev.queueIndex = done;
