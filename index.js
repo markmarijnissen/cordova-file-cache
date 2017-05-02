@@ -258,7 +258,7 @@ FileCache.prototype.toPath = function toPath(url){
       return this.localRoot + url.substr(len);
     }
   } else {
-    var ext = url.match(/\.[a-z]{1,}/g);
+    var ext = url.match(/\.[a-z,0-9]{1,}/g);
     if (ext) {
       ext = ext[ext.length-1];
     } else {
